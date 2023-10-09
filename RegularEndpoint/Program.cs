@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Messages;
 using NServiceBus;
 using NServiceBus.Logging;
 
@@ -20,6 +21,7 @@ class Program
 
         Console.WriteLine("");
         Console.WriteLine("Press [ENTER] to send a message to the serverless endpoint queue.");
+        Console.WriteLine("Press [E] to send a failing message to the serverless endpoint queue.");
         Console.WriteLine("Press [Esc] to exit.");
 
         while (true)
@@ -30,6 +32,9 @@ class Program
             {
                 case ConsoleKey.Enter:
                     await SendMessage().ConfigureAwait(false);
+                    break;
+                case ConsoleKey.E:
+                    await SendFailingMessage().ConfigureAwait(false);
                     break;
                 case ConsoleKey.Escape:
                     await endpointInstance.Stop().ConfigureAwait(false);
@@ -47,5 +52,13 @@ class Program
             .ConfigureAwait(false);
 
         Log.Info("Message sent to the serverless endpoint queue.");
+    }
+
+    static async Task SendFailingMessage()
+    {
+        await endpointInstance.Send("ServerlessEndpoint", new FailingMessage())
+            .ConfigureAwait(false);
+
+        Log.Info("Message failing message to the serverless endpoint queue.");
     }
 }
